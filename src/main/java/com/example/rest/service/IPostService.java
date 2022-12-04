@@ -14,6 +14,8 @@ public interface IPostService {
     CommonResponse<AddPostResponse> addPost(String token, MultipartFile[] image, MultipartFile video, String described,
                                             String status) throws Exception;
 
+    CommonResponse<GetPostResponse> getPost(String token, String postId) throws IOException, CommonException;
+
     CommonResponse deletePost(String token, String postId) throws IOException, CommonException;
 
     CommonResponse editPost(String token, String postId, String described, String status, MultipartFile[] image, List<String> imageIdsDeleted,

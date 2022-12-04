@@ -12,23 +12,8 @@ import javax.persistence.Table;
 public class File extends BaseModel {
     @Column(name = "content")
     private String content;
+
     @Column(name = "post_id")
     private int postId;
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public int getPostId() {
-        return postId;
-    }
-
-    public void setPostId(int postId) {
-        this.postId = postId;
-    }
 }
 

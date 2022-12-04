@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -120,7 +121,7 @@ public class UserService implements IUserService, UserDetailsService {
 
         user.setUuid(deviceId);
         user.setModifiedBy(phoneNumber);
-        user.setModifiedDate(System.currentTimeMillis());
+        user.setModifiedDate(new Date());
         user.setToken(token);
         userRepository.save(user);
         LoginResponse loginResponse = new LoginResponse();
@@ -153,7 +154,7 @@ public class UserService implements IUserService, UserDetailsService {
 
         user.setToken("");
         user.setModifiedBy(String.valueOf(userId));
-        user.setModifiedDate(System.currentTimeMillis());
+        user.setModifiedDate(new Date());
         userRepository.save(user);
 
 
@@ -165,7 +166,7 @@ public class UserService implements IUserService, UserDetailsService {
         User user = new User();
         user.setDeleted(false);
         user.setLinkAvatar("-1");
-        user.setCreatedDate(System.currentTimeMillis());
+        user.setCreatedDate(new Date());
         user.setCreatedBy(phoneNumber);
 
         return user;

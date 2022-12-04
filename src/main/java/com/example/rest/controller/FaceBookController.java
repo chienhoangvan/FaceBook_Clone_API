@@ -39,6 +39,7 @@ public class FaceBookController {
     @Autowired
     private IReportService reportService;
 
+    //Control user
     @PostMapping(path = "/signup")
     public ResponseEntity<CommonResponse<SignUpResponse>> signUp(
             @RequestParam(name = "phoneNumber") String phoneNumber,
@@ -61,6 +62,8 @@ public class FaceBookController {
         return new ResponseEntity<>(userService.logout(token), HttpStatus.OK);
     }
 
+
+    //Control Post
     @PostMapping(path = "/add-post")
     public ResponseEntity<CommonResponse<AddPostResponse>> addPost(
             @RequestParam(name = "token") String token,
@@ -69,6 +72,12 @@ public class FaceBookController {
             @RequestParam(name = "described") String described,
             @RequestParam(name = "status") String status) throws Exception {
         return new ResponseEntity<>(postService.addPost(token, image, video, described, status), HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/get-post")
+    public ResponseEntity<CommonResponse> getPost(@RequestParam(name = "token") String token,
+                                                  @RequestParam(name = "postId") String postId) throws CommonException, IOException {
+        return new ResponseEntity<>(postService.getPost(token, postId), HttpStatus.OK);
     }
 
     @PostMapping(path = "/delete-post")

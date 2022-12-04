@@ -12,22 +12,13 @@ import javax.persistence.Table;
 public class Post extends BaseModel {
     @Column(name = "content")
     private String content;
+
     @Column(name = "user_id")
     private int userId;
 
-    public String getContent() {
-        return content;
-    }
+    @Column(name = "state")
+    private String state;
 
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
+    @Column(name = "can_comment")
+    private Boolean canComment;
 }

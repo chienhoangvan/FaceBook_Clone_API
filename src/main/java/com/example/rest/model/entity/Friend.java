@@ -14,20 +14,4 @@ public class Friend extends BaseModel {
     private int idA;
     @Column(name = "idB")
     private int idB;
-
-    public int getIdA() {
-        return idA;
-    }
-
-    public void setIdA(int idA) {
-        this.idA = idA;
-    }
-
-    public int getIdB() {
-        return idB;
-    }
-
-    public void setIdB(int idB) {
-        this.idB = idB;
-    }
 }

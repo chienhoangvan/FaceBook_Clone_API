@@ -11,6 +11,7 @@ import com.example.rest.model.entity.User;
 import com.example.rest.model.mapper.PostMapper;
 import com.example.rest.model.mapper.UserMapper;
 import com.example.rest.model.response.post.AddPostResponse;
+import com.example.rest.model.response.post.Author;
 import com.example.rest.model.response.post.GetPostResponse;
 import com.example.rest.model.response.posts.AuthorResponse;
 import com.example.rest.model.response.posts.DataResponse;
@@ -31,9 +32,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -84,7 +83,7 @@ public class PostService implements IPostService {
             //Get user Id from token
             int userId = Integer.parseInt(commonService.getUserIdFromToken(token));
             if (userId > 0) {
-                Post post = postRepository.save(setCommonPostInfo(userId, described));
+                Post post = postRepository.save(setCommonPostInfo(userId, described, status));
                 if (post != null && post.getId() > 0) {
                     if (image.length > 0 && image.length <= 4 && image[0].getOriginalFilename().length() > 0) { //xem lại
                         for (int i = 0; i < image.length; i++) {
@@ -108,6 +107,51 @@ public class PostService implements IPostService {
     }
 
     @Override
+    public CommonResponse<GetPostResponse> getPost(String token, String postId) throws IOException, CommonException {
+
+        CommonResponse<GetPostResponse> commonResponse = new CommonResponse();
+        GetPostResponse data = new GetPostResponse();
+        List<Object> res = new ArrayList<>();
+
+        int userId = Integer.parseInt(commonService.getUserIdFromToken(token));
+        if (userId < 0) {
+            throw new CommonException(Constant.PARAMETER_IS_NOT_ENOUGH_CODE);
+        }
+        Post post = postRepository.findByUserIdAndId(userId, Integer.parseInt(postId)).orElse(null);
+        if (Objects.nonNull(post)) {
+            long amountLikes = likesRepository.findByPostId(postId).size();
+            long amountComments = commentRepository.findByPostId(Integer.parseInt(postId)).size();
+            Likes likes = likesRepository.findByUserIdAndPostId(userId, Integer.parseInt(postId));
+            boolean isLike;
+            if ( likes != null) {
+                isLike = true;
+            } else isLike = false;
+            List<File> file = fileRepository.findByPostId(Integer.parseInt(postId));
+            User user = userRepository.findById(post.getUserId());
+            Author author = new Author();
+            author.setAvatar(user.getLinkAvatar());
+            author.setName(user.getName());
+            author.setIsOnline(false);//hard fix
+
+            data.setPostId(postId);
+            data.setDescribed(post.getContent());
+            data.setCreated(post.getCreatedDate());
+            data.setModified(post.getModifiedDate());
+            data.setLike(amountLikes);
+            data.setComment(amountComments);
+            data.setIsLiked(isLike);
+//            data.setImage(file);
+            data.setAuthor(author);
+            data.setState(post.getState());
+            if (user.getId() == userId) {
+                data.setCanEdit(true);
+            } else data.setCanEdit(false);
+            data.setCanComment(post.getCanComment());
+            res.add(data);
+        }
+        return new CommonResponse(Constant.OK_CODE, Constant.OK_MESSAGE, res);
+    }
+    @Override
     public CommonResponse deletePost(String token, String postId) throws IOException, CommonException {
         commonService.checkCommonValidate(token, postId);
         //Lấy user id from token
@@ -125,7 +169,7 @@ public class PostService implements IPostService {
         //Xóa post -> isDeleted = true
         try {
             post.setDeleted(true);
-            post.setModifiedDate(System.currentTimeMillis());
+            post.setModifiedDate(new Date());
             post.setModifiedBy(userId);
             postRepository.save(post);
             //Xóa File của post
@@ -135,7 +179,7 @@ public class PostService implements IPostService {
                 deleteFile(file.getContent(), Path.of(Constant.ROOT_DIRECTORY));
                 file.setDeleted(true);
                 file.setModifiedBy(userId);
-                file.setModifiedDate(System.currentTimeMillis());
+                file.setModifiedDate(new Date());
                 fileRepository.save(file);
             }
         } catch (Exception e) {
@@ -348,7 +392,7 @@ public class PostService implements IPostService {
         if (described.length() > 0) {
             post.setContent(described);
             post.setModifiedBy(userId);
-            post.setModifiedDate(System.currentTimeMillis());
+            post.setModifiedDate(new Date());
             postRepository.save(post);
         }
         //Case xóa ảnh thành công
@@ -386,7 +430,7 @@ public class PostService implements IPostService {
                         file.setPostId(Integer.parseInt(postId));
                         file.setDeleted(false);
                         file.setContent(image[i].getOriginalFilename());
-                        file.setCreatedDate(System.currentTimeMillis());
+                        file.setCreatedDate(new Date());
                         file.setCreatedBy(userId);
                     }
                     commonSaveFileIntoDB(file, userId, image[i], "s");
@@ -470,19 +514,20 @@ public class PostService implements IPostService {
     private File setCommonFileInfo(String content, int postId) {
         File file = new File();
         file.setContent(content);
-        file.setCreatedDate(System.currentTimeMillis());
+        file.setCreatedDate(new Date());
         file.setDeleted(false);
         file.setPostId(postId);
         return file;
     }
 
-    private Post setCommonPostInfo(int userId, String described) {
+    private Post setCommonPostInfo(int userId, String described, String status) {
         Post post = new Post();
         post.setCreatedBy(String.valueOf(userId));
-        post.setCreatedDate(System.currentTimeMillis());
+        post.setCreatedDate(new Date());
         post.setDeleted(false);
         post.setUserId(Integer.parseInt(String.valueOf(userId)));
         post.setContent(described);
+        post.setState(status);
         return post;
     }
 
@@ -530,7 +575,7 @@ public class PostService implements IPostService {
             file.setContent(savedFile.getOriginalFilename());
         }
         file.setModifiedBy(userId);
-        file.setModifiedDate(System.currentTimeMillis());
+        file.setModifiedDate(new Date());
         fileRepository.save(file);
     }
 

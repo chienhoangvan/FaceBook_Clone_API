@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post,Integer> {
@@ -18,4 +19,6 @@ public interface PostRepository extends JpaRepository<Post,Integer> {
     @Query(value = "SELECT * FROM post WHERE post.id > :lastId AND post.deleted = false"
             , nativeQuery = true)
     List<Post> findNewPosts(@Param("lastId") String lastId);
+
+    Optional<Post> findByUserIdAndId(int userId, int postId);
 }

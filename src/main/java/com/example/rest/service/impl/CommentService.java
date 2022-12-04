@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -114,7 +115,7 @@ public class CommentService implements ICommentService {
         Comment commentEntity = new Comment();
 
         commentEntity.setDeleted(false);
-        commentEntity.setCreatedDate(System.currentTimeMillis());
+        commentEntity.setCreatedDate(new Date());
         commentEntity.setCreatedBy(String.valueOf(userId));
         commentEntity.setContent(comment);
         commentEntity.setUserId(userId);

@@ -15,6 +15,8 @@ import com.example.rest.service.IReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Service
 public class ReportService implements IReportService {
     @Autowired
@@ -70,7 +72,7 @@ public class ReportService implements IReportService {
         Report reportEntity = new Report();
 
         reportEntity.setDeleted(false);
-        reportEntity.setCreatedDate(System.currentTimeMillis());
+        reportEntity.setCreatedDate(new Date());
         reportEntity.setCreatedBy(String.valueOf(userId));
 
         reportEntity.setUserId(userId);
